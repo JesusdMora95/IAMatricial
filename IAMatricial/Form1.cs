@@ -37,6 +37,7 @@ namespace IAMatricial
 
         public string Leer(string fileName)
         {
+            string e = "-----";
             FileStream file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             StreamReader reader = new StreamReader(file);
             string linea;
@@ -58,7 +59,8 @@ namespace IAMatricial
                 }
                 m1++;
             }
-            string respuesta = m1+" x "+m2+" Vector de : "+m1+" entrada "+entrada + " salida "+salida;
+            string respuesta = "Tamaño de la matriz : -" + e +" "+ m1+" x "+m2+ "\nEntrada : " 
+                +e+e+e+e+e+ " "+entrada + "\nSalida : ---" +e+e+e+e+e+ " "+salida+ "\nPatrones : ---"+e+e+e+e+ " "+ m2;
             reader.Close();
             file.Close();
             return respuesta;
