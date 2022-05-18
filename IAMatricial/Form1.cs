@@ -20,7 +20,6 @@ namespace IAMatricial
             InitializeComponent();
             label1.Text = "";
             label2.Text = "";
-            button1.Enabled = false;
             groupBox2.Enabled = false;
         }
 
@@ -37,6 +36,31 @@ namespace IAMatricial
                 MessageBox.Show("No Se Pudo Cargar El Archivo");
             }
             //LenarMatriz();
+        }
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ban == 0)
+            {
+                checkBox2.Enabled = false;
+                checkBox3.Enabled = false;
+                comboBoxFuncion.Items.Clear();
+                comboBoxRegla.Items.Clear();
+                comboBoxFuncion.Items.Add("Escalon");
+                comboBoxRegla.Items.Add("Recla delta");
+                groupBox2.Enabled = true;
+                ban = 1;
+            }
+            else
+            {
+                checkBox2.Enabled = true;
+                checkBox3.Enabled = true;
+                comboBoxFuncion.Items.Clear();
+                comboBoxRegla.Items.Clear();
+                groupBox2.Enabled = false;
+                comboBoxFuncion.Text = "Funcion De Activacion";
+                comboBoxRegla.Text = "Regla De Entramiento";
+                ban = 0;
+            }
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
@@ -61,7 +85,6 @@ namespace IAMatricial
                 groupBox2.Enabled = false;
                 comboBoxFuncion.Text = "Funcion De Activacion";
                 comboBoxRegla.Text = "Regla De Entramiento";
-                EstadoBoton();
                 ban = 0;
             }
         }
@@ -89,46 +112,18 @@ namespace IAMatricial
                 groupBox2.Enabled = false;
                 comboBoxFuncion.Text = "Funcion De Activacion";
                 comboBoxRegla.Text = "Regla De Entramiento";
-                EstadoBoton();
                 ban = 0;
             }
         }
 
         private void comboBoxFuncion_SelectedIndexChanged(object sender, EventArgs e)
         {
-            EstadoBoton();
+            
         }
 
         private void comboBoxRegla_SelectedIndexChanged(object sender, EventArgs e)
         {
-            EstadoBoton();
-        }
-
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            if (ban == 0)
-            {
-                checkBox2.Enabled = false;
-                checkBox3.Enabled = false;
-                comboBoxFuncion.Items.Clear();
-                comboBoxRegla.Items.Clear();
-                comboBoxFuncion.Items.Add("Escalon");
-                comboBoxRegla.Items.Add("Recla delta");
-                groupBox2.Enabled = true;
-                ban = 1;
-            }
-            else
-            {
-                checkBox2.Enabled = true;
-                checkBox3.Enabled = true;
-                comboBoxFuncion.Items.Clear();
-                comboBoxRegla.Items.Clear();
-                groupBox2.Enabled = false;
-                comboBoxFuncion.Text = "Funcion De Activacion";
-                comboBoxRegla.Text = "Regla De Entramiento";
-                EstadoBoton();
-                ban = 0;
-            }
+            
         }
 
         private string Leer(string fileName)
@@ -161,6 +156,7 @@ namespace IAMatricial
             file.Close();
             return respuesta;
         }
+
         private Boolean ParaCiclo(string linea, int n)
         {
             if (SaberSiContunuaEntrada(linea, n) || SaberSiContunuaSalida(linea, n))
@@ -172,6 +168,7 @@ namespace IAMatricial
                 return false;
             }
         }
+
         private Boolean SaberSiContunuaEntrada(string linea, int n)
         {
             try
@@ -197,18 +194,6 @@ namespace IAMatricial
                 return false;
             }
         }
-
-        private void EstadoBoton()
-        {
-            if (!comboBoxFuncion.Text.Equals("Funcion De Activacion") && !comboBoxRegla.Text.Equals("Regla De Entramiento"))
-            {
-                button1.Enabled = true;
-            }
-            else
-            {
-                button1.Enabled = false;
-            }
-        } 
 
         /*private void LenarMatriz()
         {
