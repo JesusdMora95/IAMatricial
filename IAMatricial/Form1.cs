@@ -318,6 +318,20 @@ namespace IAMatricial
                 Process.Start("explorer.exe", ruta);
         }
 
+        private void button10_Click(object sender, EventArgs e)
+        {
+            if (!ruta2.Equals(""))
+            {
+                Process.Start("explorer.exe", ruta2);
+            }
+            else
+            {
+                if (!ruta.Equals("") && ruta2.Equals(""))
+                    Process.Start("explorer.exe", ruta);
+            }
+                
+        }
+
         // fin codigos de interfaz
 
         //codigos de parametrizacion
@@ -464,7 +478,7 @@ namespace IAMatricial
             }
         }
 
-        private double[] FuncionSoma(string[,] matrizdePesos, string[] umbral, string[,] matrizdeEntrada)
+        private double[] FuncionSoma(double[,] matrizdePesos, string[] umbral, string[,] matrizdeEntrada)
         {
             double[] resultado =  new double[salida];
             double paso;
@@ -473,7 +487,7 @@ namespace IAMatricial
                 resultado[i] = 0;
                 for (int j = 0; j < salida; j++)
                 {
-                    paso = double.Parse(matrizdeEntrada[i, j]) * double.Parse(matrizdePesos[i, j]);
+                    paso = double.Parse(matrizdeEntrada[i, j]) * matrizdePesos[i, j];
                     resultado[i] = resultado[i] + paso ;
                 }
                 resultado[i] = resultado[i] - double.Parse(umbral[i]);
@@ -504,17 +518,25 @@ namespace IAMatricial
                 double[] LineaSalida = new double[dato];
                 double[,] TodoSalida = new double[entrada,salida];
                 string[,] matrizres = LeerSalidas(ruta2);
+                string[,] matrizpesos = LeerPesos(ruta);
+                double[,] pesos = new double[entrada, salida];
+                string[] stringUmbrales = LeerUmbrales(ruta);
+                double[] umbrales = new double[salida];
+                double suma=0;
+                double[] ErrorePatron = new double[int.Parse(textBox1.Text)+1];
                 for (int i = 0; i < salida; i++)
                 {
                     for (int j = 0; j < salida; j++)
                     {
-                        TodoSalida[j, i] = Convert.ToDouble(matrizres[i, j]);
+                        TodoSalida[i, j] = Convert.ToDouble(matrizres[i, j]);
+                        pesos[i, j] = Convert.ToDouble(matrizpesos[i,j]);
                     }
+                    umbrales[i] = Convert.ToDouble(stringUmbrales[i]);
                 }
                 while (q <= Convert.ToInt32(textBox1.Text))
                 {
                     LineaSalida = ObtenerLinea(TodoSalida, q);
-                    SFuncion = FuncionSoma(LeerPesos(ruta), LeerUmbrales(ruta), LeerEntradas(ruta2));
+                    SFuncion = FuncionSoma(pesos, umbrales, LeerEntradas(ruta2));
                     if (checkBox1.Checked)
                     {
                         int ciclo = 0;
@@ -536,10 +558,35 @@ namespace IAMatricial
                         SSalida = SFuncion;
                     }
                     ELineal = ErrorLineal(LineaSalida, SSalida, dato);
+                    for (int o = 0; o < salida; o++)
+                    {
+                        suma = Math.Abs(ELineal[o]) + suma;
+                    }
+                    ErrorePatron[q] = suma / salida;
                     q++;
-                    MessageBox.Show("entra"+ Convert.ToInt32(textBox1.Text));
+                    pesos = NuevosPesos(pesos, double.Parse(textBox2.Text), ELineal, LeerEntradas(ruta2));
+                    umbrales = NuevosUmbrales(umbrales, double.Parse(textBox2.Text),ELineal);
                 }
             }
+        }
+
+        private double[] NuevosUmbrales(double[] umbrales, double p, double[] eLineal)
+        {
+            double[] resultado = new double[salida];
+            return resultado;
+        }
+
+        private double[,] NuevosPesos(double[,] datosPesos, double r, double[] eLineal, string[,] datosEntradas)
+        {
+            double[,] resultadosPesos = new double[entrada, salida];
+            for (int i = 0; i < salida; i++)
+            {
+                for (int j = 0; j < salida; j++)
+                {
+                    resultadosPesos[j, i] = datosPesos[j, i] + r * eLineal[i] * double.Parse(datosEntradas[j, i]);
+                }
+            }
+            return resultadosPesos;
         }
 
         private void button9_Click(object sender, EventArgs e)
@@ -706,7 +753,6 @@ namespace IAMatricial
             }
         }
 
-
         private double[] ObtenerLinea(double[,] matriz, int k)
         {
             int dato = entrada * salida;
@@ -734,5 +780,7 @@ namespace IAMatricial
             }
             return resul;
         }
+
+
     }
 }
