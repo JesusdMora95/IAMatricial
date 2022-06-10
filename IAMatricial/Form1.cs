@@ -265,7 +265,7 @@ namespace IAMatricial
         {
             try
             {
-                if (cadena.Equals("0,")|| cadena.Equals("0"))
+                if (cadena.Equals("0,")|| cadena.Equals("0")|| cadena.Equals("0,0") || cadena.Equals("0,00"))
                 {
                     return false;
                 }
@@ -478,7 +478,7 @@ namespace IAMatricial
             }
         }
 
-        private double[] FuncionSoma(double[,] matrizdePesos, string[] umbral, string[,] matrizdeEntrada)
+        private double[] FuncionSoma(double[,] matrizdePesos, double[] umbral, string[,] matrizdeEntrada)
         {
             double[] resultado =  new double[salida];
             double paso;
@@ -490,7 +490,7 @@ namespace IAMatricial
                     paso = double.Parse(matrizdeEntrada[i, j]) * matrizdePesos[i, j];
                     resultado[i] = resultado[i] + paso ;
                 }
-                resultado[i] = resultado[i] - double.Parse(umbral[i]);
+                resultado[i] = resultado[i] - umbral[i];
             }
             return resultado;
         }
@@ -511,6 +511,7 @@ namespace IAMatricial
             if (bandera == 0) 
             {
                 int q = 0;
+                double[] datosGrafica = new double[Convert.ToInt32(textBox1.Text)+1];
                 double[] SFuncion = new double[salida];
                 double[] SSalida = new double[salida];
                 double[] ELineal = new double[salida];
@@ -523,7 +524,7 @@ namespace IAMatricial
                 string[] stringUmbrales = LeerUmbrales(ruta);
                 double[] umbrales = new double[salida];
                 double suma=0;
-                double[] ErrorePatron = new double[int.Parse(textBox1.Text)+1];
+                double[] ErrorePatron = new double[m1+1];
                 for (int i = 0; i < salida; i++)
                 {
                     for (int j = 0; j < salida; j++)
@@ -535,44 +536,54 @@ namespace IAMatricial
                 }
                 while (q <= Convert.ToInt32(textBox1.Text))
                 {
-                    LineaSalida = ObtenerLinea(TodoSalida, q);
-                    SFuncion = FuncionSoma(pesos, umbrales, LeerEntradas(ruta2));
-                    if (checkBox1.Checked)
+                    for (int it = 0; it < m1; it++)
                     {
-                        int ciclo = 0;
-                        while (ciclo < salida)
+                        LineaSalida = ObtenerLinea(TodoSalida, it);
+                        SFuncion = FuncionSoma(pesos, umbrales, LeerEntradas(ruta2));
+                        if (checkBox1.Checked)
                         {
-                            if (SFuncion[ciclo] < 0)
+                            int ciclo = 0;
+                            while (ciclo < salida)
                             {
-                                SSalida[ciclo] = 0;
+                                if (SFuncion[ciclo] < 0)
+                                {
+                                    SSalida[ciclo] = 0;
+                                }
+                                if (SFuncion[ciclo] >= 0)
+                                {
+                                    SSalida[ciclo] = 1;
+                                }
+                                ciclo++;
                             }
-                            if (SFuncion[ciclo] >= 0)
-                            {
-                                SSalida[ciclo] = 1;
-                            }
-                            ciclo++;
                         }
+                        if (checkBox2.Checked)
+                        {
+                            SSalida = SFuncion;
+                        }
+                        ELineal = ErrorLineal(LineaSalida, SSalida, dato);
+                        for (int o = 0; o < salida; o++)
+                        {
+                            suma = Math.Abs(ELineal[o]) + suma;
+                        }
+                        ErrorePatron[it] = suma / salida;
+                        pesos = NuevosPesos(pesos, double.Parse(textBox2.Text), ELineal, LeerEntradas(ruta2));
+                        umbrales = NuevosUmbrales(umbrales, double.Parse(textBox2.Text), ELineal);
+                        datosGrafica[q] = ErrorePatron[it] + datosGrafica[q];
                     }
-                    if (checkBox2.Checked)
-                    {
-                        SSalida = SFuncion;
-                    }
-                    ELineal = ErrorLineal(LineaSalida, SSalida, dato);
-                    for (int o = 0; o < salida; o++)
-                    {
-                        suma = Math.Abs(ELineal[o]) + suma;
-                    }
-                    ErrorePatron[q] = suma / salida;
+                    datosGrafica[q] = datosGrafica[q] / m1;
                     q++;
-                    pesos = NuevosPesos(pesos, double.Parse(textBox2.Text), ELineal, LeerEntradas(ruta2));
-                    umbrales = NuevosUmbrales(umbrales, double.Parse(textBox2.Text),ELineal);
                 }
+                Graficar(datosGrafica, q);
             }
         }
 
         private double[] NuevosUmbrales(double[] umbrales, double p, double[] eLineal)
         {
             double[] resultado = new double[salida];
+            for (int i = 0; i < salida; i++)
+            {
+                resultado[i] = umbrales[i] + p * eLineal[i] * 1;
+            }
             return resultado;
         }
 
@@ -621,7 +632,6 @@ namespace IAMatricial
             }
             n2 = 0;
             c = 0;
-            Graficar(umbralesLectura);
             return umbralesLectura;
         }
 
@@ -743,13 +753,13 @@ namespace IAMatricial
             }
         }
 
-        private void Graficar(string[] umbralesLectura)
+        private void Graficar(double[] umbralesLectura, int q)
         {
             chart1.Palette = ChartColorPalette.Pastel;
-            for (int i = 0; i < c; i++) 
+            for (int i = 1; i < q; i++) 
             {
                 Series series = chart1.Series.Add("Iteracion "+i);
-                series.Points.Add(Convert.ToDouble(umbralesLectura[i]));
+                series.Points.Add(umbralesLectura[i]);
             }
         }
 
